@@ -23,10 +23,10 @@ export default class FileManager {
     }
 
     const outputDir = Settings.getInstance().getOutputDir();
-    docsProcessor.onBeforeProcess(sortedClasses, Settings.getInstance().getOutputDir());
-
+    docsProcessor.onBeforeProcess(sortedClasses, outputDir);
     sortedClasses.forEach(classModel => {
       docsProcessor.process(classModel, outputDir);
     });
+    docsProcessor.onAfterProcess(sortedClasses, outputDir);
   }
 }
