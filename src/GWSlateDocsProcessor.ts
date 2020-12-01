@@ -12,6 +12,10 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
 
   public onBeforeProcess(classes: ClassModel[], outputDir: string) {
     this.classes = classes;
+    const self = this;
+    this.classes.sort((c1, c2) => {
+      return self.getClassTitle(c1).localeCompare(self.getClassTitle(c2));
+    });
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir);
     }
@@ -54,7 +58,7 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
   }
 
   private generateModelDocs(generator: MarkdownHelper, classModel: ClassModel, level: number) {
-    generator.addTitle(classModel.getClassName(), level);
+    generator.addTitle(this.getClassTitle(classModel), level);
 
     if (classModel.getDescription()) {
       generator.addText(classModel.getDescription());
@@ -71,11 +75,20 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
     }
   }
 
-  private generateActionDocs(generator: MarkdownHelper, classModel: ClassModel, level: number) {
-    const execute = classModel.getMethods().find(m => m.getMethodName() === 'execute');
-    const invocableMethod = execute?.getAnnotations().find(a => a.getName() === 'InvocableMethod');
+  private getClassTitle(classModel: ClassModel) {
+    if (classModel.getClassName().endsWith('Action')) {
+      const invocableMethod = classModel
+        .getMethods()
+        .flatMap(m => m.getAnnotations())
+        .find(a => a.getName() === 'InvocableMethod');
+      return invocableMethod?.getModifier('label') || classModel.getClassName();
+    } else {
+      return classModel.getClassName();
+    }
+  }
 
-    const title = invocableMethod?.getModifier('label') || classModel.getClassName();
+  private generateActionDocs(generator: MarkdownHelper, classModel: ClassModel, level: number) {
+    const title = this.getClassTitle(classModel);
     generator.addTitle(title, level);
 
     if (classModel.getDescription()) {
