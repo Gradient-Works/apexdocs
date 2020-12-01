@@ -68,14 +68,22 @@ export default class ClassParser {
 
       // handle multiple lines for description.
       if (inDescription) {
-        let j;
-        for (j = 0; j < comment.length; j++) {
-          const ch = comment.charAt(j);
-          if (ch !== '*' && ch !== ' ') break;
+        cModel.setDescription(cModel.getDescription() + '\n');
+        const match = comment.trim().match(/^\*\s?(.*)$/);
+        if (match) {
+          const descLine = match[1];
+          cModel.setDescription(cModel.getDescription() + descLine);
+        } else {
+          let j;
+          for (j = 0; j < comment.length; j++) {
+            const ch = comment.charAt(j);
+            if (ch !== '*' && ch !== ' ') break;
+          }
+          if (j < comment.length) {
+            cModel.setDescription(cModel.getDescription() + ' ' + comment.substring(j));
+          }
         }
-        if (j < comment.length) {
-          cModel.setDescription(cModel.getDescription() + ' ' + comment.substring(j));
-        }
+
         continue;
       }
     }
