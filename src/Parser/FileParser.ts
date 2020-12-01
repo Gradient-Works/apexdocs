@@ -127,8 +127,6 @@ export default class FileParser {
               const modValue = mod[3] || mod[2];
               modifiers.set(modName, modValue);
             }
-            console.log(`${annotation}(${annotationBody})`);
-            console.log(modifiers);
           }
           annotationModels.push(new AnnotationModel(annotation, modifiers));
         }
