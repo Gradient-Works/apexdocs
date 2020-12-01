@@ -1,4 +1,5 @@
 import Settings from '../Settings';
+import AnnotationModel from '../Model/AnnotationModel';
 
 export default class ApexModel {
   protected nameLine: string = '';
@@ -10,6 +11,7 @@ export default class ApexModel {
   private example: string = '';
   private scope: string = '';
   private isNamespaceAccessible: boolean = false;
+  private annotations: Array<AnnotationModel> = [];
 
   getNameLine() {
     return this.nameLine;
@@ -79,6 +81,15 @@ export default class ApexModel {
 
   getIsNamespaceAccessible() {
     return this.isNamespaceAccessible;
+  }
+
+  setAnnotations(annotations: Array<AnnotationModel>) {
+    // Make a copy
+    this.annotations = [...annotations];
+  }
+
+  getAnnotations() {
+    return this.annotations;
   }
 
   private parseScope() {

@@ -8,6 +8,7 @@ import PropertyParser from './PropertyParser';
 import EnumParser from './EnumParser';
 
 import { peek } from '../utils';
+import AnnotationModel from '../Model/AnnotationModel';
 
 export default class FileParser {
   parseFileContents(rawFileContents: string): ClassModel | null {
@@ -23,6 +24,7 @@ export default class FileParser {
     let cModel: ClassModel | null = null;
     let cModelParent;
     const cModels = [];
+    const annotationModels = [];
 
     const contentLines = this.splitAndClean(rawFileContents);
     // TODO: There is no difference between iLine and i, let's get rid of one
@@ -79,6 +81,59 @@ export default class FileParser {
         continue;
       }
 
+      if (strLine.startsWith('@')) {
+        const match = strLine.match(/^@([a-zA-Z]+)\s*(.*)$/);
+        if (match) {
+          const annotation = match[1];
+          let input = match[2];
+          let annotationBody = null;
+          if (input.startsWith('(')) {
+            annotationBody = '';
+            input = input.substr(1);
+            if (input.length == 0) {
+              i = i + 1;
+              input = contentLines[i].trim();
+              iLine++;
+            }
+            for (let c = 0; c < input.length; c++) {
+              let ch = input[c];
+              if (ch === ')') {
+                if (c + 1 < input.length) {
+                  strLine = input.substr(c + 1);
+                } else {
+                  strLine = '';
+                }
+                break;
+              } else {
+                annotationBody += ch;
+              }
+              if (c + 1 >= input.length) {
+                // get next line
+                i = i + 1;
+                input = ' ' + contentLines[i].trim();
+                c = -1;
+                iLine++;
+              }
+            }
+          }
+
+          const modifiers = new Map<string, string>();
+          if (annotationBody) {
+            let scan = /(\w+)\s?=\s?('([^']*)'|\S+)/g;
+            let mod = null;
+            while ((mod = scan.exec(annotationBody)) !== null) {
+              const modName = mod[1];
+              // A string value will match mod[3], anything else mod[2]
+              const modValue = mod[3] || mod[2];
+              modifiers.set(modName, modValue);
+            }
+            console.log(`${annotation}(${annotationBody})`);
+            console.log(modifiers);
+          }
+          annotationModels.push(new AnnotationModel(annotation, modifiers));
+        }
+      }
+
       // keep track of our nesting so we know which class we are in
       const openCurlies = this.countChars(strLine, '{');
       const closeCurlies = this.countChars(strLine, '}');
@@ -129,8 +184,10 @@ export default class FileParser {
         // create the new class
         const cModelNew = new ClassParser().getClass(strLine, lstComments, iLine, cModelParent);
         cModelNew.setIsNamespaceAccessible(namespaceAccessible);
+        cModelNew.setAnnotations(annotationModels);
         // Resetting namespace accessible flag once it has been set.
         namespaceAccessible = undefined;
+        annotationModels.splice(0, annotationModels.length);
         lstComments.splice(0, lstComments.length);
 
         // keep track of the new class, as long as it wasn't a single liner {}
@@ -150,8 +207,10 @@ export default class FileParser {
       if (strLine.toLowerCase().includes(' enum ')) {
         const enumModel = new EnumParser().getEnum(strLine, lstComments, iLine);
         enumModel.setIsNamespaceAccessible(namespaceAccessible);
+        enumModel.setAnnotations(annotationModels);
         // Resetting namespace accessible flag once it has been set.
         namespaceAccessible = undefined;
+        annotationModels.splice(0, annotationModels.length);
         if (cModel) {
           cModel.addChildEnum(enumModel);
         } else {
@@ -177,8 +236,10 @@ export default class FileParser {
           const parsedClassName = cModel.getClassName().substr(cModel.getClassName().indexOf('.') + 1);
           const mModel = new MethodParser().getMethod(parsedClassName, strLine, lstComments, iLine);
           mModel.setIsNamespaceAccessible(namespaceAccessible);
+          mModel.setAnnotations(annotationModels);
           // Resetting namespace accessible flag once it has been set.
           namespaceAccessible = undefined;
+          annotationModels.splice(0, annotationModels.length);
           cModel.getMethods().push(mModel);
         }
 
@@ -201,8 +262,10 @@ export default class FileParser {
       if (cModel) {
         const propertyModel = new PropertyParser().getProperty(strLine, lstComments, iLine);
         propertyModel.setIsNamespaceAccessible(namespaceAccessible);
+        propertyModel.setAnnotations(annotationModels);
         // Resetting namespace accessible flag once it has been set.
         namespaceAccessible = undefined;
+        annotationModels.splice(0, annotationModels.length);
         cModel.getProperties().push(propertyModel);
       }
 
