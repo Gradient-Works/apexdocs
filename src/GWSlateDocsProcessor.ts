@@ -128,10 +128,10 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
             prop.getPropertyName(),
             iv?.getModifier('required') === 'true' ? 'Yes' : 'No',
             this.typeMarkdown(prop.getReturnType()),
-            (iv?.getModifier('description') || prop.getDescription()),
+            iv?.getModifier('description') || prop.getDescription(),
           ];
           generator.addText(row.join('|'));
-        },this);
+        }, this);
       }
     }
 
@@ -161,23 +161,18 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
       const row = [
         prop.getPropertyName(),
         this.typeMarkdown(prop.getReturnType()),
-        (iv?.getModifier('description') || prop.getDescription())
+        iv?.getModifier('description') || prop.getDescription(),
       ];
       generator.addText(row.join('|'));
-    },this);
+    }, this);
   }
 
   private typeMarkdown(type: string) {
     const typedCollection = type.match(/(.+)<([^>]+)>$/);
-    if(typedCollection) {
+    if (typedCollection) {
       const collectionType = typedCollection[1];
       const typeParams = typedCollection[2].split(/\s*,\s*/);
-      return (
-        collectionType+
-        '&lt;'+
-        typeParams.map(t => this.concreteTypeMarkdown(t),this).join(',')+
-        '&gt;'
-      );
+      return collectionType + '&lt;' + typeParams.map(t => this.concreteTypeMarkdown(t), this).join(',') + '&gt;';
     } else {
       return this.concreteTypeMarkdown(type);
     }
@@ -185,8 +180,8 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
 
   private concreteTypeMarkdown(type: string) {
     const referencedClass = this.classes.find(c => c.getClassName() === type);
-    if(referencedClass) {
-      return `[${type}](#${type.toLowerCase()})`
+    if (referencedClass) {
+      return `[${type}](#${type.toLowerCase()})`;
     } else {
       return type;
     }
