@@ -19,7 +19,7 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir);
     }
-    this.getGenerator('actions').addTitle('Actions', 1);
+    this.getGenerator('actions').addTitle('Flow Actions', 1);
     this.getGenerator('models').addTitle('Models', 1);
   }
 
@@ -59,6 +59,7 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
 
   private generateModelDocs(generator: MarkdownHelper, classModel: ClassModel, level: number) {
     generator.addTitle(this.getClassTitle(classModel), level);
+    generator.addText(`API Name: \`GradientWorks__${classModel.getClassName()}\``);
 
     if (classModel.getDescription()) {
       generator.addText(classModel.getDescription());
@@ -90,6 +91,8 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
   private generateActionDocs(generator: MarkdownHelper, classModel: ClassModel, level: number) {
     const title = this.getClassTitle(classModel);
     generator.addTitle(title, level);
+
+    generator.addText(`<%= screenshot '${classModel.getClassName()}'%>`);
 
     if (classModel.getDescription()) {
       generator.addText(classModel.getDescription().trim());
