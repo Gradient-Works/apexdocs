@@ -182,7 +182,7 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
   }
 
   private classLink(type: string, referencedClass?: ClassModel) {
-    if(!referencedClass) {
+    if (!referencedClass) {
       referencedClass = this.classes.find(c => c.getClassName() === type);
     }
 
@@ -190,9 +190,9 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
       const title = this.getClassTitle(referencedClass);
       const tocFragment = title
         .toLowerCase()
-        .replace(/[^a-z0-9\-_]+/g,'-')
-        .replace(/-+/g,'-')
-        .replace(/^-|-$/g,'');
+        .replace(/[^a-z0-9\-_]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
       return `[${title}](#${tocFragment})`;
     } else {
       return type;
@@ -201,12 +201,12 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
 
   private autoLinkClasses(text: string) {
     let autoLinkText = text;
-    for(const classModel of this.classes) {
+    for (const classModel of this.classes) {
       const name = classModel.getClassName();
-      const nameRegex = new RegExp(`(?<=^|\\W)${name}(?=\\W|$)`,'g');
-      const md = this.classLink(name,classModel);
-      console.log(`Replacing ${name} with ${md} using ${nameRegex}`)
-      autoLinkText = autoLinkText.replace(nameRegex,md);
+      const nameRegex = new RegExp(`(?<=^|\\W)${name}(?=\\W|$)`, 'g');
+      const md = this.classLink(name, classModel);
+      console.log(`Replacing ${name} with ${md} using ${nameRegex}`);
+      autoLinkText = autoLinkText.replace(nameRegex, md);
     }
     return autoLinkText;
   }
