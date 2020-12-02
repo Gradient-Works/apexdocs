@@ -127,11 +127,11 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
           const row = [
             prop.getPropertyName(),
             iv?.getModifier('required') === 'true' ? 'Yes' : 'No',
-            prop.getReturnType(),
-            prop.getDescription(),
+            this.typeMarkdown(prop.getReturnType()),
+            (iv?.getModifier('description') || prop.getDescription()),
           ];
           generator.addText(row.join('|'));
-        });
+        },this);
       }
     }
 
@@ -157,8 +157,38 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
     generator.addText(columns.join('|'));
     generator.addText(columns.map(col => '-'.repeat(col.length)).join('|'));
     properties.forEach(prop => {
-      const row = [prop.getPropertyName(), prop.getReturnType(), prop.getDescription()];
+      const iv = prop.getAnnotations().find(a => a.getName() === 'InvocableVariable');
+      const row = [
+        prop.getPropertyName(),
+        this.typeMarkdown(prop.getReturnType()),
+        (iv?.getModifier('description') || prop.getDescription())
+      ];
       generator.addText(row.join('|'));
-    });
+    },this);
+  }
+
+  private typeMarkdown(type: string) {
+    const typedCollection = type.match(/(.+)<([^>]+)>$/);
+    if(typedCollection) {
+      const collectionType = typedCollection[1];
+      const typeParams = typedCollection[2].split(/\s*,\s*/);
+      return (
+        collectionType+
+        '&lt;'+
+        typeParams.map(t => this.concreteTypeMarkdown(t),this).join(',')+
+        '&gt;'
+      );
+    } else {
+      return this.concreteTypeMarkdown(type);
+    }
+  }
+
+  private concreteTypeMarkdown(type: string) {
+    const referencedClass = this.classes.find(c => c.getClassName() === type);
+    if(referencedClass) {
+      return `[${type}](#${type.toLowerCase()})`
+    } else {
+      return type;
+    }
   }
 }
