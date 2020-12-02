@@ -205,7 +205,6 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
       const name = classModel.getClassName();
       const nameRegex = new RegExp(`(?<=^|\\W)${name}(?=\\W|$)`, 'g');
       const md = this.classLink(name, classModel);
-      console.log(`Replacing ${name} with ${md} using ${nameRegex}`);
       autoLinkText = autoLinkText.replace(nameRegex, md);
     }
     return autoLinkText;
