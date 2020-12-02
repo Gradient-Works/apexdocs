@@ -62,7 +62,7 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
     generator.addText(`API Name: \`GradientWorks__${classModel.getClassName()}\``);
 
     if (classModel.getDescription()) {
-      generator.addText(classModel.getDescription());
+      generator.addText(this.autoLinkClasses(classModel.getDescription()));
     }
 
     const properties = classModel
@@ -95,7 +95,7 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
     generator.addText(`<%= screenshot '${classModel.getClassName()}'%>`);
 
     if (classModel.getDescription()) {
-      generator.addText(classModel.getDescription().trim());
+      generator.addText(this.autoLinkClasses(classModel.getDescription().trim()));
     }
 
     const reqClass = classModel.getChildClasses().find(c => c.getClassName().includes('Request'));
@@ -131,7 +131,7 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
             prop.getPropertyName(),
             iv?.getModifier('required') === 'true' ? 'Yes' : 'No',
             this.typeMarkdown(prop.getReturnType()),
-            iv?.getModifier('description') || prop.getDescription(),
+            this.autoLinkClasses(iv?.getModifier('description') || prop.getDescription()),
           ];
           generator.addText(row.join('|'));
         }, this);
@@ -164,7 +164,7 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
       const row = [
         prop.getPropertyName(),
         this.typeMarkdown(prop.getReturnType()),
-        iv?.getModifier('description') || prop.getDescription(),
+        this.autoLinkClasses(iv?.getModifier('description') || prop.getDescription()),
       ];
       generator.addText(row.join('|'));
     }, this);
@@ -175,18 +175,39 @@ export default class GWSlateDocsProcessor extends DocsProcessor {
     if (typedCollection) {
       const collectionType = typedCollection[1];
       const typeParams = typedCollection[2].split(/\s*,\s*/);
-      return collectionType + '&lt;' + typeParams.map(t => this.concreteTypeMarkdown(t), this).join(',') + '&gt;';
+      return collectionType + '&lt;' + typeParams.map(t => this.classLink(t), this).join(',') + '&gt;';
     } else {
-      return this.concreteTypeMarkdown(type);
+      return this.classLink(type);
     }
   }
 
-  private concreteTypeMarkdown(type: string) {
-    const referencedClass = this.classes.find(c => c.getClassName() === type);
+  private classLink(type: string, referencedClass?: ClassModel) {
+    if(!referencedClass) {
+      referencedClass = this.classes.find(c => c.getClassName() === type);
+    }
+
     if (referencedClass) {
-      return `[${type}](#${type.toLowerCase()})`;
+      const title = this.getClassTitle(referencedClass);
+      const tocFragment = title
+        .toLowerCase()
+        .replace(/[^a-z0-9\-_]+/g,'-')
+        .replace(/-+/g,'-')
+        .replace(/^-|-$/g,'');
+      return `[${title}](#${tocFragment})`;
     } else {
       return type;
     }
+  }
+
+  private autoLinkClasses(text: string) {
+    let autoLinkText = text;
+    for(const classModel of this.classes) {
+      const name = classModel.getClassName();
+      const nameRegex = new RegExp(`(?<=^|\\W)${name}(?=\\W|$)`,'g');
+      const md = this.classLink(name,classModel);
+      console.log(`Replacing ${name} with ${md} using ${nameRegex}`)
+      autoLinkText = autoLinkText.replace(nameRegex,md);
+    }
+    return autoLinkText;
   }
 }
