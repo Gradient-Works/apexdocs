@@ -54,4 +54,3 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_COLOR: '#00ff00'
           MSG_MINIMAL: true
-
