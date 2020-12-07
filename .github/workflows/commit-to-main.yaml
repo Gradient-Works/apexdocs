@@ -1,0 +1,56 @@
+name: commit-to-main
+on:
+  push:
+    branches:
+      - main
+jobs:
+  on_commit:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+      - 
+	      name: notify kickoff
+        uses: Gradient-Works/action-slack-notify@v0.1-alpha
+        env:
+          SLACK_MESSAGE: Follow along at ${{ format('https://github.com/{0}/actions/runs/{1}', github.repository, github.run_id) }}
+          SLACK_CHANNEL: '#engineering'
+          SLACK_ICON_EMOJI: ':smithers'
+          SLACK_TITLE: Starting docker build for apexdocs
+          SLACK_USERNAME: waylon
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          MSG_MINIMAL: true
+      -
+        name: Build Container
+        run: make build-docker
+      -
+        name: Push Container
+        run: make publish-docker
+      - 
+      	name: notify on failure
+        if: ${{ failure() }}
+        uses: Gradient-Works/action-slack-notify@v0.1-alpha
+        env:
+          SLACK_CHANNEL: '#engineering'
+          SLACK_MESSAGE: Take a look at ${{ format('https://github.com/{0}/actions/runs/{1}', github.repository, github.run_id) }} to see what happened
+          SLACK_ICON_EMOJI: ':smithers'
+          SLACK_TITLE: Failed docker build for apexdocs
+          SLACK_USERNAME: waylon
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_COLOR: '#ff0000'
+          MSG_MINIMAL: true
+      -
+	      name: notify on success
+        if: ${{ success() }}
+        uses: Gradient-Works/action-slack-notify@v0.1-alpha
+        env:
+          SLACK_CHANNEL: '#engineering'
+          SLACK_MESSAGE: ${{ format('https://github.com/{0}/actions/runs/{1}', github.repository, github.run_id) }}
+          SLACK_ICON_EMOJI: ':smithers'
+          SLACK_TITLE: Successful docker build for apexdocs
+          SLACK_USERNAME: waylon
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_COLOR: '#00ff00'
+          MSG_MINIMAL: true
+
