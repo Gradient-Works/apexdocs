@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-        gw-159
+      - gw-159
 jobs:
   on_commit:
     runs-on: ubuntu-latest
