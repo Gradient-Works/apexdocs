@@ -1,5 +1,5 @@
 import Settings from '../Settings';
-import AnnotationModel from '../Model/AnnotationModel';
+import AnnotationModel from '../model/AnnotationModel';
 
 export default class ApexModel {
   protected nameLine: string = '';
