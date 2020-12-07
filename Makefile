@@ -11,4 +11,3 @@ build-docker: ## Build docker container
 publish-docker: ## Publish docker container
 	docker push ghcr.io/gradient-works/apexdocs:latest
 	docker push ghcr.io/gradient-works/apexdocs:$(SHA)
-
