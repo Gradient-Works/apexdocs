@@ -12,7 +12,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       - 
-	      name: notify kickoff
+        name: notify kickoff
         uses: Gradient-Works/action-slack-notify@v0.1-alpha
         env:
           SLACK_MESSAGE: Follow along at ${{ format('https://github.com/{0}/actions/runs/{1}', github.repository, github.run_id) }}
@@ -29,7 +29,7 @@ jobs:
         name: Push Container
         run: make publish-docker
       - 
-      	name: notify on failure
+        name: notify on failure
         if: ${{ failure() }}
         uses: Gradient-Works/action-slack-notify@v0.1-alpha
         env:
@@ -42,7 +42,7 @@ jobs:
           SLACK_COLOR: '#ff0000'
           MSG_MINIMAL: true
       -
-	      name: notify on success
+        name: notify on success
         if: ${{ success() }}
         uses: Gradient-Works/action-slack-notify@v0.1-alpha
         env:
