@@ -8,7 +8,7 @@ import PropertyParser from './PropertyParser';
 import EnumParser from './EnumParser';
 
 import { peek } from '../utils';
-import AnnotationModel from '../Model/AnnotationModel';
+import AnnotationModel from '../model/AnnotationModel';
 
 export default class FileParser {
   parseFileContents(rawFileContents: string): ClassModel | null {
