@@ -9,6 +9,7 @@ import DocsifyDocsProcessor from '../DocsifyDocsProcessor';
 import JekyllDocsProcessor from '../JekyllDocsProcessor';
 import GWSlateDocsProcessor from '../GWSlateDocsProcessor';
 import GWGitbookDocsProcessor from '../GWGitbookDocsProcessor';
+import GWMCPDocsProcessor from '../GWMCPDocsProcessor';
 
 export function generate(
   sourceDirectory: string,
@@ -28,6 +29,8 @@ export function generate(
     Settings.getInstance().setDocsProcessor(new GWSlateDocsProcessor());
   } else if (targetGenerator === 'gw-gitbook') {
     Settings.getInstance().setDocsProcessor(new GWGitbookDocsProcessor());
+  } else if (targetGenerator === 'gw-mcp') {
+    Settings.getInstance().setDocsProcessor(new GWMCPDocsProcessor());
   } else {
     Settings.getInstance().setDocsProcessor(new DocsifyDocsProcessor());
   }
