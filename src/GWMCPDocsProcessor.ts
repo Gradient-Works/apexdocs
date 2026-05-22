@@ -210,6 +210,7 @@ function renderAction(
 export default class GWMCPDocsProcessor extends DocsProcessor {
   private byCategory: Map<string, Array<[ClassModel, string]>> = new Map();
   private typeRegistry: Map<string, ClassModel> = new Map();
+  private preambleRegistry: Map<string, ClassModel> = new Map();
 
   public onBeforeProcess(_classes: ClassModel[], outputDir: string) {
     if (!fs.existsSync(outputDir)) {
@@ -230,7 +231,12 @@ export default class GWMCPDocsProcessor extends DocsProcessor {
         this.byCategory.get(category)!.push([classModel, actionName]);
       }
     } else {
-      // Not an action — register as a type if it has @AuraEnabled properties
+      // Register as a category preamble if it has a @group matching a known category
+      const group = classModel.getClassGroup();
+      if (group && CATEGORY_ORDER.includes(group)) {
+        this.preambleRegistry.set(group, classModel);
+      }
+      // Register as a type if it has @AuraEnabled properties
       const hasAuraEnabledProps = classModel.getProperties().some(p =>
         p.getAnnotations().some(a => a.getName() === 'AuraEnabled')
       );
@@ -255,6 +261,13 @@ export default class GWMCPDocsProcessor extends DocsProcessor {
       const lines: string[] = [`# ${category}`, ''];
       const catDesc = CATEGORY_DESCRIPTIONS[category];
       if (catDesc) lines.push(catDesc, '');
+
+      const preamble = this.preambleRegistry.get(category);
+      if (preamble) {
+        const preambleDesc = preamble.getDescription().trim();
+        if (preambleDesc) lines.push(preambleDesc, '');
+        lines.push('---', '');
+      }
 
       for (const [classModel, actionName] of actions) {
         lines.push(renderAction(classModel, actionName, this.typeRegistry));
