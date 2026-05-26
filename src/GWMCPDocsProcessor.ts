@@ -32,7 +32,7 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
     'Utility actions for building and querying data structures: record maps, SOQL queries, and text collections.',
   'Dynamic Books': 'Actions for checking account eligibility against target books and triggering retrievals.',
   Users: 'Actions for reading and updating rep capacity and weight on a Gradient Works queue.',
-  Logs: 'Actions for writing messages to the Gradient Works log, useful for debugging flow executions.',
+  Logs: 'Actions for writing messages to Gradient Works Log Entries, useful for debugging flow executions.',
   Events: 'Actions for handling Gradient Works platform events.',
   Leads: 'Actions for converting leads.',
   Assign: 'Direct assignment actions.',
