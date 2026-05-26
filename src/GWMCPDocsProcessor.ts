@@ -25,7 +25,7 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   Queues: 'Actions for enqueueing records and assigning items to users via Gradient Works queues.',
   Matching: 'Actions for matching leads to accounts, contacts, and other leads.',
   Flows:
-    'Lifecycle actions that bookend a Gradient Works flow. Place Start at the top and Finish at the bottom of every flow to enable execution tracing.',
+    'Flow lifecycle and subflow execution actions. Place Start at the top and Finish at the bottom of every flow to enable execution tracing. Use Execute Subflow to dynamically invoke a subflow or to run subflows in scheduled paths where the native Subflow element does not work.',
   'Next Steps':
     'Post-assignment actions: creating tasks, enrolling prospects in cadences, sending Slack or email notifications.',
   Collections:
