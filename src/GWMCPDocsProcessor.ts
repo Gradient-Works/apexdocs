@@ -239,6 +239,11 @@ export default class GWMCPDocsProcessor extends DocsProcessor {
     const label = getActionLabel(classModel);
 
     if (label) {
+      // Skip deprecated actions
+      if (classModel.getDescription().trim().toLowerCase().startsWith('deprecated')) {
+        return;
+      }
+
       // It's an invocable action — file under its category
       const [category, actionName] = parseCategory(label);
       if (category) {
@@ -247,6 +252,7 @@ export default class GWMCPDocsProcessor extends DocsProcessor {
         }
         this.byCategory.get(category)!.push([classModel, actionName]);
       }
+
       // Action classes can carry a category preamble via @preamble / @end-preamble in their description
       const preambleMatch = classModel.getDescription().match(/@preamble\n([\s\S]*?)@end-preamble/);
       if (preambleMatch && category) {
