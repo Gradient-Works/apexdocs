@@ -82,8 +82,8 @@ function categorySlug(category: string): string {
 function getActionLabel(classModel: ClassModel): string {
   const invocableMethod = classModel
     .getMethods()
-    .flatMap((m) => m.getAnnotations())
-    .find((a) => a.getName() === 'InvocableMethod');
+    .flatMap(m => m.getAnnotations())
+    .find(a => a.getName() === 'InvocableMethod');
   return invocableMethod?.getModifier('label') || '';
 }
 
@@ -94,8 +94,8 @@ function parseCategory(label: string): [string, string] {
 }
 
 function getPropDescription(prop: PropertyModel): string {
-  const iv = prop.getAnnotations().find((a) => a.getName() === 'InvocableVariable');
-  const ae = prop.getAnnotations().find((a) => a.getName() === 'AuraEnabled');
+  const iv = prop.getAnnotations().find(a => a.getName() === 'InvocableVariable');
+  const ae = prop.getAnnotations().find(a => a.getName() === 'AuraEnabled');
   return (iv?.getModifier('description') || ae?.getModifier('description') || prop.getDescription() || '')
     .replace(/\n/g, ' ')
     .replace(/\|/g, '\\|')
@@ -109,9 +109,7 @@ function renderTypeExpansion(typeName: string, typeRegistry: Map<string, ClassMo
   const desc = model.getDescription().trim();
   const props = model
     .getProperties()
-    .filter((p) =>
-      p.getAnnotations().some((a) => a.getName() === 'AuraEnabled' || a.getName() === 'InvocableVariable'),
-    );
+    .filter(p => p.getAnnotations().some(a => a.getName() === 'AuraEnabled' || a.getName() === 'InvocableVariable'));
 
   if (props.length === 0) return '';
 
@@ -139,8 +137,8 @@ function renderPropertyTable(
   const header = showRequired ? '| Field | Type | Required | Description |' : '| Field | Type | Description |';
   const sep = showRequired ? '|-------|------|----------|-------------|' : '|-------|------|-------------|';
 
-  const rows = properties.map((prop) => {
-    const iv = prop.getAnnotations().find((a) => a.getName() === 'InvocableVariable');
+  const rows = properties.map(prop => {
+    const iv = prop.getAnnotations().find(a => a.getName() === 'InvocableVariable');
     const desc = getPropDescription(prop);
     const type = prop.getReturnType();
     const name = prop.getPropertyName();
@@ -179,14 +177,14 @@ function renderAction(classModel: ClassModel, actionName: string, typeRegistry: 
   const desc = fullDesc.replace(/@preamble\n[\s\S]*?@end-preamble\n?/g, '').trim();
   if (desc) lines.push(desc, '');
 
-  const reqClass = classModel.getChildClasses().find((c) => c.getClassName().includes('Request'));
+  const reqClass = classModel.getChildClasses().find(c => c.getClassName().includes('Request'));
   const inputs = (reqClass?.getProperties() ?? [])
-    .filter((p) => {
-      if (!p.getAnnotations().some((a) => a.getName() === 'InvocableVariable')) return false;
+    .filter(p => {
+      if (!p.getAnnotations().some(a => a.getName() === 'InvocableVariable')) return false;
       const d = (
         p
           .getAnnotations()
-          .find((a) => a.getName() === 'InvocableVariable')
+          .find(a => a.getName() === 'InvocableVariable')
           ?.getModifier('description') ||
         p.getDescription() ||
         ''
@@ -197,14 +195,14 @@ function renderAction(classModel: ClassModel, actionName: string, typeRegistry: 
       const aReq =
         a
           .getAnnotations()
-          .find((x) => x.getName() === 'InvocableVariable')
+          .find(x => x.getName() === 'InvocableVariable')
           ?.getModifier('required') === 'true'
           ? 1
           : 0;
       const bReq =
         b
           .getAnnotations()
-          .find((x) => x.getName() === 'InvocableVariable')
+          .find(x => x.getName() === 'InvocableVariable')
           ?.getModifier('required') === 'true'
           ? 1
           : 0;
@@ -215,9 +213,9 @@ function renderAction(classModel: ClassModel, actionName: string, typeRegistry: 
   lines.push('### Inputs', '');
   lines.push(renderPropertyTable(inputs, true, typeRegistry));
 
-  const resultClass = classModel.getChildClasses().find((c) => c.getClassName().includes('Result'));
+  const resultClass = classModel.getChildClasses().find(c => c.getClassName().includes('Result'));
   const outputs = (resultClass?.getProperties() ?? [])
-    .filter((p) => p.getAnnotations().some((a) => a.getName() === 'InvocableVariable'))
+    .filter(p => p.getAnnotations().some(a => a.getName() === 'InvocableVariable'))
     .sort((a, b) => a.getPropertyName().localeCompare(b.getPropertyName()));
 
   lines.push('### Outputs', '');
@@ -242,7 +240,13 @@ export default class GWMCPDocsProcessor extends DocsProcessor {
 
     if (label) {
       // Skip deprecated actions
-      if (classModel.getDescription().trim().toLowerCase().startsWith('deprecated')) {
+      if (
+        classModel
+          .getDescription()
+          .trim()
+          .toLowerCase()
+          .startsWith('deprecated')
+      ) {
         return;
       }
 
@@ -269,7 +273,7 @@ export default class GWMCPDocsProcessor extends DocsProcessor {
       // Register as a type if it has @AuraEnabled properties
       const hasAuraEnabledProps = classModel
         .getProperties()
-        .some((p) => p.getAnnotations().some((a) => a.getName() === 'AuraEnabled'));
+        .some(p => p.getAnnotations().some(a => a.getName() === 'AuraEnabled'));
       if (hasAuraEnabledProps) {
         this.typeRegistry.set(classModel.getClassName(), classModel);
       }
@@ -280,8 +284,8 @@ export default class GWMCPDocsProcessor extends DocsProcessor {
     const written: string[] = [];
 
     const allCategories = [
-      ...CATEGORY_ORDER.filter((c) => this.byCategory.has(c)),
-      ...[...this.byCategory.keys()].filter((c) => !CATEGORY_ORDER.includes(c)),
+      ...CATEGORY_ORDER.filter(c => this.byCategory.has(c)),
+      ...[...this.byCategory.keys()].filter(c => !CATEGORY_ORDER.includes(c)),
     ];
 
     for (const category of allCategories) {
