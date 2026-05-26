@@ -27,7 +27,7 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
   Flows:
     'Flow lifecycle and subflow execution actions. Place Start at the top and Finish at the bottom of every flow to enable execution tracing. Use Execute Subflow to dynamically invoke a subflow or to run subflows in scheduled paths where the native Subflow element does not work.',
   'Next Steps':
-    'Post-assignment actions: creating tasks, enrolling prospects in cadences, sending Slack or email notifications.',
+    'Post-assignment actions: creating tasks, adding people to campaigns, enrolling prospects in cadences, checking cadence enrollment, and sending Slack messages.',
   Collections:
     'Utility actions for building and querying data structures: record maps, SOQL queries, and text collections.',
   'Dynamic Books': 'Actions for checking account eligibility against target books and triggering retrievals.',
