@@ -172,6 +172,8 @@ function renderPropertyTable(
 function renderAction(classModel: ClassModel, actionName: string, typeRegistry: Map<string, ClassModel>): string {
   const lines: string[] = [`## ${actionName}`, ''];
 
+  lines.push(`**Action class:** \`${classModel.getClassName()}\``, '');
+
   const fullDesc = classModel.getDescription().trim();
   // Strip any @preamble / @end-preamble block — that content is hoisted to the category header.
   const desc = fullDesc.replace(/@preamble\n[\s\S]*?@end-preamble\n?/g, '').trim();
