@@ -248,7 +248,7 @@ export default class GWGitbookDocsProcessor extends DocsProcessor {
     if (referencedClass) {
       const title = this.getClassTitle(referencedClass);
       let path = '';
-      if(this.isAction(referencedClass)) {
+      if (this.isAction(referencedClass)) {
         const match = title.split(/^(.*)\s*:\s*(.*)$/);
         let category = '';
         let actionTitle = title;

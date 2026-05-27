@@ -119,12 +119,12 @@ export default class FileParser {
 
           const modifiers = new Map<string, string>();
           if (annotationBody) {
-            let scan = /(\w+)\s?=\s?('([^']*)'|\S+)/g;
+            let scan = /(\w+)\s?=\s?('((?:[^'\\]|\\.)*)'|\S+)/g;
             let mod = null;
             while ((mod = scan.exec(annotationBody)) !== null) {
               const modName = mod[1];
               // A string value will match mod[3], anything else mod[2]
-              const modValue = mod[3] || mod[2];
+              const modValue = mod[3] ? mod[3].replace(/\\'/g, "'") : mod[2];
               modifiers.set(modName, modValue);
             }
           }
